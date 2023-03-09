@@ -1,0 +1,255 @@
+﻿@page "/pizza"
+@using Dtos
+@using DemoBlazorServer.Services.ViewModels
+@using DemoBlazorServer.Enums
+
+@inject DemoBlazorServer.Core.Abstractions.IPizzeria Pizzeria
+
+<PageTitle>Management pizzas</PageTitle>
+
+<h1>Management des pizzas</h1>
+
+<div class="row">
+    <div class="col-8">
+        @if (InitialValues == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-6">
+                    <EditForm id="pizza-form"
+                              OnValidSubmit="@SubmitForm"
+                              EditContext="@PizzaEditContext"
+                              Context="pizza_context">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Nom</label>
+                            <InputText id="Name" @bind-Value="CurrentPizza.Name" class="form-control" />
+                            <ValidationMessage For="() => CurrentPizza.Name" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="PizzaDoughId" class="form-label">Pâte à pizza</label>
+                            <InputSelect id="PizzaDoughId" @bind-Value="CurrentPizza.PizzaDoughId" class="form-control">
+                                @foreach (var pizzaDough in InitialValues.PizzaDoughs)
+                                {
+                                    <option value="@(pizzaDough.Id)">@(pizzaDough.Name)</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => CurrentPizza.PizzaDoughId" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="size" class="form-label">Taille</label>
+                            <InputSelect id="size" @bind-Value="CurrentPizza.Size" class="form-control">
+
+                                @foreach (var size in Enum.GetValues<PizzaSizes>())
+                                {
+                                    <option value="@size">@size</option>
+                                }
+
+                            </InputSelect>
+                        </div>
+                        @if (CurrentPizza.IngredientQuantities.Count > 0)
+                        {
+                            <CurrentPizzaIngredients IngredientQuantities="@CurrentPizza.IngredientQuantities"
+                                                     Ingredients="InitialValues.Ingredients"
+                                                     OnDelete="@DeleteIngredientQuantity"/>
+                        }
+                        <button type="submit" form="pizza-form" class="btn btn-primary">Valider</button>
+                    </EditForm>
+                </div>
+                <div class="col-6">
+                    <h3>Liste des ingrédients</h3>
+                    <ul class="list-group">
+                        @foreach (var ingredient in InitialValues.Ingredients)
+                        {
+                            <li class="list-group-item" @onclick="() => OnSelectIngredient(ingredient)">@(ingredient.Name)</li>
+                        }
+                    </ul>
+                    @if (CurrentIngredientQuantity.Ingredient.Id != Guid.Empty)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <EditForm id="ingredient-form"
+                                          OnValidSubmit="@SubmitIngredientForm"
+                                          EditContext="@IngredientEditContext"
+                                          Context="ingredient_context">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+                                    <h3>@(CurrentIngredientQuantity.Ingredient.Name) (@(CurrentIngredientQuantity.Ingredient.Kcal) Kcal)</h3>
+                                    <div class="mb-3">
+                                        <label for="Quantity" class="form-label">Quantité</label>
+                                        <InputNumber id="Quantity" @bind-Value="CurrentIngredientQuantity.Quantity" class="form-control" />
+                                    </div>
+                                    <button type="submit" form="ingredient-form" class="btn btn-primary">Valider</button>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="col-4">
+        @if (Pizzas == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <PizzasTable Pizzas="Pizzas"
+                         OnDelete="@DeletePizza"
+                         OnEdit="@EditPizza"/>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    [Inject]
+    private PizzaViewModel? ViewModel { get; set; }
+
+    private IReadOnlyList<PizzaModel>? Pizzas { get; set; } = null;
+    private PizzaFormModel CurrentPizza { get; set; } = new();
+    private PizzaViewModelValues InitialValues { get; set; } = new();
+    private IngredientQuantityModel CurrentIngredientQuantity { get; set; } = new();
+
+    private EditContext? PizzaEditContext;
+    private EditContext? IngredientEditContext;
+
+
+
+
+    protected override void OnInitialized()
+    {
+        PizzaEditContext = new(CurrentPizza);
+        IngredientEditContext = new(CurrentIngredientQuantity);
+
+        Pizzas = Pizzeria.GetPizzas();
+        if (ViewModel != null)
+        {
+            InitialValues = ViewModel.GetInitialValues();
+        }
+    }
+
+    private void SubmitForm()
+    {
+        if (PizzaEditContext == null || !PizzaEditContext.Validate())
+            return;
+
+        if (Pizzas == null)
+            return;
+
+        if (CurrentPizza.Id != Guid.Empty)
+        {
+            Pizzeria.EditPizza(FormatPizzaToEditOrCreate(CurrentPizza.Id));
+        }
+        else
+        {
+            Pizzeria.CreatePizza(FormatPizzaToEditOrCreate(Guid.NewGuid()));
+        }
+        CurrentPizza = new();
+        StateHasChanged();
+    }
+
+    private void SubmitIngredientForm()
+    {
+        if (IngredientEditContext == null || !IngredientEditContext.Validate())
+            return;
+
+        if (InitialValues.Ingredients.Count == 0)
+            return;
+
+        if (CurrentPizza == null)
+            return;
+
+        if (CurrentIngredientQuantity.Ingredient.Id == Guid.Empty)
+            return;
+
+        CurrentPizza.IngredientQuantities.Add(
+            new IngredientQuantityFormModel()
+            {
+                IngredientId = CurrentIngredientQuantity.Ingredient.Id,
+                Quantity = CurrentIngredientQuantity.Quantity
+            });
+        CurrentIngredientQuantity = new();
+    }
+
+    private PizzaFormModel FormatPizzaToEditOrCreate(Guid guid)
+    {
+        var ingredientQuantities = new List<IngredientQuantityFormModel>();
+
+        foreach (var ingredientQuantity in CurrentPizza.IngredientQuantities)
+        {
+            ingredientQuantities.Add(new IngredientQuantityFormModel()
+            {
+                IngredientId = ingredientQuantity.IngredientId,
+                Quantity = ingredientQuantity.Quantity
+            });
+        }
+        var pizza = new PizzaFormModel()
+        {
+            Id = guid,
+            PizzaDoughId = CurrentPizza.PizzaDoughId,
+            Name = CurrentPizza.Name,
+            IngredientQuantities = ingredientQuantities
+
+        };
+        return pizza;
+    }
+
+    private void DeletePizza(Guid id)
+    {
+        Pizzeria.DeletePizzaDough(id);
+    }
+
+    private void EditPizza(Guid id)
+    {
+        if (Pizzas != null)
+        {
+            var pizzaToEdit = Pizzas.First(pd => pd.Id == id);
+            var ingredientQuantities = new List<IngredientQuantityFormModel>();
+
+            foreach (var ingredientQuantity in pizzaToEdit.IngredientQuantities)
+            {
+                ingredientQuantities.Add(new IngredientQuantityFormModel()
+                {
+                    IngredientId = ingredientQuantity.Ingredient.Id,
+                    Quantity = ingredientQuantity.Quantity
+                });
+            }
+
+            CurrentPizza = new()
+            {
+                Id = pizzaToEdit.Id,
+                Name = pizzaToEdit.Name,
+                PizzaDoughId = pizzaToEdit.PizzaDough.Id,
+                IngredientQuantities = ingredientQuantities
+
+            };
+        }
+
+    }
+
+    private void OnSelectIngredient(IngredientModel ingredient)
+    {
+        CurrentIngredientQuantity = new IngredientQuantityModel()
+        {
+            Ingredient = ingredient,
+            Quantity = 0
+        };
+    }
+
+    private void DeleteIngredientQuantity(IngredientQuantityFormModel ingredientQuantity)
+    {
+        CurrentPizza.IngredientQuantities.RemoveAll(iq => iq.IngredientId == ingredientQuantity.IngredientId );
+    }
+
+}

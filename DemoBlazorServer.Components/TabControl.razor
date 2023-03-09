@@ -1,0 +1,23 @@
+﻿<CascadingValue Value="this">
+    <ul class="nav nav-pills nav-justified">
+        @foreach (var page in Pages)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link @GetActiveClass(page)"
+                        type="button"
+                        @onclick="@(() => ActiveTab(page))">
+                        @if (TitleWrapper != null)
+                        {
+                                @TitleWrapper(page)
+                        }
+                        else
+                        {
+                            @(page.Title)
+                        }
+
+                </button>
+            </li>
+        }
+    </ul>
+    @ChildContent
+</CascadingValue>

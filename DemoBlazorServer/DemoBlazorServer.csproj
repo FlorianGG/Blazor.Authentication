@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <None Remove="Dtos\" />
+    <None Remove="Services\" />
+    <None Remove="Services\Extensions\" />
+    <None Remove="Services\ViewModels\" />
+    <None Remove="Core\" />
+    <None Remove="Core\Abstractions\" />
+    <None Remove="Services\Datas\" />
+    <None Remove="Core\Controllers\" />
+    <None Remove="Services\Authentication\" />
+    <None Remove="Core\Localization\" />
+    <None Remove="Core\Localization\SharedResource.en" />
+    <None Remove="Core\Localization\SharedResource.fr" />
+    <None Remove="Public\" />
+    <None Remove="Public\Auth\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Extensions\" />
+    <Folder Include="Services\ViewModels\" />
+    <Folder Include="Core\" />
+    <Folder Include="Core\Abstractions\" />
+    <Folder Include="Services\Datas\" />
+    <Folder Include="Core\Controllers\" />
+    <Folder Include="Services\Authentication\" />
+    <Folder Include="Core\Localization\" />
+    <Folder Include="Public\" />
+    <Folder Include="Public\Auth\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DemoBlazorServer.GrpcServices\DemoBlazorServer.GrpcServices.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\DemoBlazorServer.Grpc.Proto\DemoBlazorServer.Grpc.Proto.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\DemoBlazorServer.Enums\DemoBlazorServer.Enums.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\DemoBlazorServer.Components\DemoBlazorServer.Components.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Localization" />
+  </ItemGroup>
+</Project>

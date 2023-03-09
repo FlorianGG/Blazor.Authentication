@@ -1,0 +1,60 @@
+﻿@page "/pizzaHome"
+
+<h1>Tableau de bord des pizzas</h1>
+
+
+
+<div class="btn-group" role="group" aria-label="Basic example">
+    <a class="btn btn-primary" href="pizzaDough" role="button">Pâte à pizza</a>
+    <a class="btn btn-primary" href="ingredient" role="button">Ingrédients</a>
+    <a class="btn btn-primary" href="pizza" role="button">Pizza</a>
+    <button type="button" class="btn btn-primary" @onclick="() => modalComponent?.Open()">Ouverture Modal</button>
+</div>
+
+<div class="row mt-4">
+    <div class="col-6">
+        <TabControl>
+            <TabPage Title="Tab 1">
+                <h1>The first tab</h1>
+            </TabPage>
+            <TabPage Title="Tab 2">
+                <h1>The second tab</h1>
+            </TabPage>
+            <TabPage Title="Tab 3">
+                <h1>The third tab</h1>
+            </TabPage>
+        </TabControl>
+    </div>
+    <div class="col-6">
+        <TabControl>
+            <TitleWrapper Context="Title">
+                Onglet: @(Title.Title)
+            </TitleWrapper>
+            <ChildContent>
+                <TabPage Title="Tab 1">
+                    <h1>The first tab</h1>
+                </TabPage>
+                <TabPage Title="Tab 2">
+                    <h1>The second tab</h1>
+                </TabPage>
+                <TabPage Title="Tab 3">
+                    <h1>The third tab</h1>
+                </TabPage>
+            </ChildContent>
+        </TabControl>
+    </div>
+</div>
+
+
+
+<Modal Title="Ma modal" @ref="modalComponent">
+    Coucou la modal!
+</Modal>
+
+
+@code {
+
+    private Modal? modalComponent;
+
+    }
+

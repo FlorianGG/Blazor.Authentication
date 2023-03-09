@@ -1,0 +1,48 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "AuthGrpc";
+
+import "google/protobuf/timestamp.proto";
+
+package auth;
+
+service Auth {
+  rpc LoginAsync (LoginAsyncRequest) returns (LoginAsyncReply);
+  rpc RefreshTokenAsync (RefreshTokenAsyncRequest) returns (RefreshTokenAsyncReply);
+}
+
+message LoginAsyncRequest {
+  string Login = 1;
+  string Password = 2;
+}
+
+message LoginAsync {
+  string Token = 1;
+  string RefreshToken = 2;
+  google.protobuf.Timestamp ExpirationDate = 3;
+}
+
+message LoginAsyncReply {
+    oneof loginResult {
+        LoginAsync result = 1;
+        string errorMessage = 2;
+    }
+}
+
+message RefreshTokenAsyncRequest {
+   string RefreshToken = 1;
+   string ExpiredToken = 2;
+}
+
+message RefreshTokenAsync {
+    string Token = 1;
+    string RefreshToken = 2;
+    google.protobuf.Timestamp ExpirationDate = 3;
+}
+
+message RefreshTokenAsyncReply {
+    oneof refreshTokenResult {
+        RefreshTokenAsync result = 1;
+        string errorMessage = 2;
+    }
+}

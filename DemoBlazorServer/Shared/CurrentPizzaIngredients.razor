@@ -1,0 +1,45 @@
+﻿@using DemoBlazorServer.Dtos
+
+<ul class="list-group">
+    @foreach (var ingredientQuantity in IngredientQuantities)
+    {
+        <li class="list-group-item d-flex justify-content-between">
+            <span>@($"{GetIngredientName(ingredientQuantity.IngredientId)} - {ingredientQuantity.Quantity}")</span>
+            <button type="button"
+                    class="btn btn-danger btn-small"
+                    @onclick="@(() => DeleteHandler(ingredientQuantity))">
+                <span class="oi oi-trash" aria-hidden="true"></span>
+            </button>
+            <span class="d-flex"></span>
+        </li>
+    }
+</ul>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public List<IngredientQuantityFormModel> IngredientQuantities { get; set; } = new();
+
+    [Parameter]
+    [EditorRequired]
+    public IReadOnlyList<IngredientModel> Ingredients { get; set; } = new List<IngredientModel>().AsReadOnly();
+
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<IngredientQuantityFormModel> OnDelete { get; set; }
+
+    private string GetIngredientName(Guid id)
+    {
+        var ingredient = Ingredients.First(i => i.Id == id);
+
+        return ingredient.Name;
+    }
+
+    private async void DeleteHandler(IngredientQuantityFormModel ingredientQuantity)
+    {
+        await this.OnDelete.InvokeAsync(ingredientQuantity);
+    }
+
+}
+

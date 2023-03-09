@@ -1,0 +1,33 @@
+﻿@using DemoBlazorServer.Core.Abstractions;
+
+@if (IsLoading)
+{
+    <p>Chargement des données en cours...</p>
+}
+else
+{
+    @ChildContent
+}
+
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Inject]
+    public IPizzeria? Pizzeria { get; set; }
+
+    private bool IsLoading { get; set; } = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Pizzeria != null)
+        {
+            await Pizzeria.InitPizzeria();
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+}
+
+

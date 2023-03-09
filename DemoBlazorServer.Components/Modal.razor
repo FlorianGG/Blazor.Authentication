@@ -1,0 +1,20 @@
+﻿@if (IsClose) return;
+
+<div class="modal @GetDisplayClass()">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Close">@CancelText</button>
+                <button type="button" class="btn btn-primary"@onclick="OnValidateHandler">@ValidText</button>
+            </div>
+        </div>
+    </div>
+</div>
+

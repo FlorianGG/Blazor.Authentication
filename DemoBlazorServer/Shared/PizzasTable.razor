@@ -1,0 +1,55 @@
+﻿@using DemoBlazorServer.Dtos;
+
+<GenericTable Items="@Pizzas" Context="pizza">
+    <HeaderContent>
+        <tr>
+            <th>Nom</th>
+            <th>Actions</th>
+        </tr>
+    </HeaderContent>
+    <RowContent>
+        <tr>
+            <td>@pizza.Name</td>
+            <td>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button"
+                            class="btn btn-danger"
+                            @onclick="@(() => DeleteHandler(pizza.Id))">
+                        <span class="oi oi-trash" aria-hidden="true"></span>
+                    </button>
+                    <button type="button"
+                            class="btn btn-warning"
+                            @onclick="@(() => EditHandler(pizza.Id))">
+                        <span class="oi oi-pencil" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </RowContent>
+</GenericTable>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IReadOnlyList<PizzaModel> Pizzas { get; set; } = new List<PizzaModel>().AsReadOnly();
+
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<Guid> OnDelete { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<Guid> OnEdit { get; set; }
+
+    public async void DeleteHandler(Guid id)
+    {
+        await this.OnDelete.InvokeAsync(id);
+    }
+
+    public async void EditHandler(Guid id)
+    {
+        await this.OnDelete.InvokeAsync(id);
+    }
+
+}
+

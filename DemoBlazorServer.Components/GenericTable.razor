@@ -1,0 +1,44 @@
+﻿@typeparam ItemType
+@if (HeaderContent != null && RowContent != null)
+{
+    <table class="table">
+        @if (Items == null)
+        {
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Chargement en cours...</td></tr>
+            </tbody>
+        }
+        else if (Items.Count == 0)
+        {
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Aucune donnée à afficher</td></tr>
+            </tbody>
+        }
+        else
+        {
+            <thead>
+                @HeaderContent
+            </thead>
+            <tbody>
+                @foreach (var item in Items)
+                {
+                    if (RowContent != null)
+                    {
+                        @RowContent(item)
+                    }
+                }
+            </tbody>
+        }
+    </table>
+}
+
